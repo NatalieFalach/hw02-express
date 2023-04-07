@@ -29,13 +29,13 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   const contacts = await readContacts();
-  const contactToRemove = contacts.filter(
-    (contact) => contact.id === contactId
+  const idx = contacts.findIndex(
+    contact => contact.id === contactId
   );
 
-  if (contactToRemove.length > 0) {
-    const newContacts = contacts.filter((contact) => contact.id !== contactId);
-    await updateContacts(newContacts);
+  if (idx !== -1) {
+    contacts.splice(idx, 1);
+    await updateContacts(contacts);
 
     return true;
   } else {
