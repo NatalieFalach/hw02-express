@@ -1,69 +1,19 @@
-const express = require('express')
-const { listContacts, getContactById, addContact, removeContact, updateContact } = require('../../models/contacts')
-const Joi = require('joi');
+const express = require("express");
+const ctrl = require("../../controller/contacts");
+const { validateBody, isValidId } = require("../../middlewares");
+const joiSchemas = require("../../schemas/contacts");
 const router = express.Router();
 
-const createSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required()
-});
+router.get("/", ctrl.getAll);
 
-const updateChema = Joi.object({
-   name: Joi.string(),
-   email: Joi.string(),
-   phone: Joi.string()
-}).or('name', 'email', 'phone');
+router.get("/:id", isValidId, ctrl.getById);
 
-router.get('/', async (req, res, next) => {
-  const data = await listContacts();
-  res.json(data);
-})
+router.post("/", validateBody(joiSchemas.createSchema), ctrl.add);
 
-router.get('/:contactId', async (req, res, next) => {
-  const result = await getContactById(req.params.contactId)
-  if (!result) {
-    return res.status(404).json({ message: 'Not found' })
-  }
+router.put("/:id", isValidId, validateBody(joiSchemas.updateSchema), ctrl.updateById)
 
-  res.json(result);
-})
+router.patch("/:id/favorite", isValidId, validateBody(joiSchemas.updateFavoriteSchema), ctrl.updateStatusContact);
 
-router.post('/', async (req, res, next) => {
-  const { error } = createSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message});
-  }
+router.delete("/:id", isValidId, ctrl.deleteById);
 
-  const data = await addContact(req.body);
-  res.status(201).json(data)
-})
-
-router.delete('/:contactId', async (req, res, next) => {
-  const result = await removeContact(req.params.contactId);
-  if (!result) {
-    return res.status(404).json({ message: 'Not found' }); 
-  } 
-
-  res.json({ message: "Contact deleted" });
-})
-
-router.put('/:contactId', async (req, res, next) => {
-  if (Object.keys(req.body).length === 0) {
-    return res.status(400).json({ message: 'missing fields'});
-  }
-  
-  const { error } = updateChema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message});
-  }
-
-  const result = await updateContact(req.params.contactId, req.body);
-  if (!result) {
-    return res.status(404).json({ message: 'Not found' });
-  }
-
-  res.json(result);   
-})
-
-module.exports = router
+module.exports = router;
