@@ -1,19 +1,21 @@
 const express = require("express");
 const ctrl = require("../../controller/contacts");
-const { validateBody, isValidId } = require("../../middlewares");
+const { validateBody, isValidId, authenticate } = require("../../middlewares");
 const joiSchemas = require("../../schemas/contacts");
 const router = express.Router();
 
-router.get("/", ctrl.getAll);
+router.get("/", authenticate, ctrl.getAll);
 
-router.get("/:id", isValidId, ctrl.getById);
+router.get("/:id", authenticate, isValidId, ctrl.getById);
 
-router.post("/", validateBody(joiSchemas.createSchema), ctrl.add);
+router.post("/", authenticate, validateBody(joiSchemas.createSchema), ctrl.add);
 
-router.put("/:id", isValidId, validateBody(joiSchemas.updateSchema), ctrl.updateById)
+router.put("/:id", authenticate, isValidId, validateBody(joiSchemas.updateSchema), ctrl.updateById)
 
-router.patch("/:id/favorite", isValidId, validateBody(joiSchemas.updateFavoriteSchema), ctrl.updateStatusContact);
+router.patch("/:id/favorite", authenticate, isValidId, validateBody(joiSchemas.updateFavoriteSchema), ctrl.updateStatusContact);
 
-router.delete("/:id", isValidId, ctrl.deleteById);
+router.delete("/:id", authenticate, isValidId, ctrl.deleteById);
+
+router.delete("/:id", authenticate, isValidId, ctrl.deleteById);
 
 module.exports = router;
