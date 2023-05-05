@@ -29,3 +29,8 @@
 - `npm run start:dev` &mdash; старт сервера в режимі розробки (development)
 - `npm run lint` &mdash; запустити виконання перевірки коду з eslint, необхідно виконувати перед кожним PR та виправляти всі помилки лінтера
 - `npm lint:fix` &mdash; та ж перевірка лінтера, але з автоматичними виправленнями простих помилок
+
+### Запуск через Docker
+- `docker build -t my-node .` &mdash; Створення докер образу (Image) на основі Dockerfile
+- `docker run --name my_node_container -it -d -p 3000:3000  my-node`  &mdash; Створення та запуск контейнеру на основі образу 
+- `docker exec -ti my_node_container bash` &mdash; Команда яка дозволяє зайти у контейнер тазапускати команди
